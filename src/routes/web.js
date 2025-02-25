@@ -1,4 +1,5 @@
 import express from "express";
+import backendController from "./../controller/backendController"
 
 const router = express.Router();
 
@@ -7,9 +8,10 @@ const router = express.Router();
  * @param {*} app 
  */
 const initWebRoutes = (app) => {
-    router.get("/", (req, res) => {
-        return res.send("Hello world")
-    })
+    router.get("/", backendController.handleHomepage);
+    router.get("/users", backendController.handleUsePage);
+    router.post("/users/create-user", backendController.createNewUser)
+
 
     return app.use("/", router)
 }
