@@ -9,12 +9,12 @@ const handleUsePage = async (req, res) => {
     return res.render("userPage.ejs", { userList })
 }
 
-const createNewUser = (req, res) => {
+const createNewUser = async (req, res) => {
     let email = req.body.email;
     let password = req.body.password;
     let username = req.body.username;
 
-    backendService.createNewUserService(email, password, username);
+    await backendService.createNewUserService(email, password, username);
 
     return res.redirect("/users");
 }
@@ -25,11 +25,7 @@ const handleDeleteUser = async (req, res) => {
 }
 
 const getUpdateUserPage = async (req, res) => {
-    let user = await backendService.getUserById(req.params.id);
-    let userData = {}
-    if (user && user.length > 0) {
-        userData = user[0]
-    }
+    let userData = await backendService.getUserById(req.params.id);
     return res.render("editUserPage.ejs", { userData });
 }
 
