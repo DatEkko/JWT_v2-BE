@@ -1,5 +1,7 @@
 import bcrypt from 'bcryptjs';
 import db from '../models/index.js'
+import { where } from 'sequelize/lib/sequelize';
+import { raw } from 'body-parser';
 
 const salt = bcrypt.genSaltSync(10);
 
