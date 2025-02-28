@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import db from '../models/index.js';
 import { where } from 'sequelize/lib/sequelize';
+import { Op } from 'sequelize';
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -45,20 +46,19 @@ const handleRegisterService = async (data) => {
         let isEmailExist = await checkEmailExist(data.email);
         let isPhoneExist = await checkPhoneExist(data.phone);
 
-        if (isEmailExist) {
-            return {
-                EM: "Email already use",
-                EC: -3
-            }
-        }
-
         if (isPhoneExist) {
             return {
-                EM: "Phone number already use",
+                EM: "SĐT này đã được sử dụng",
                 EC: -4
             }
         }
 
+        if (isEmailExist) {
+            return {
+                EM: "Email này đã được sử dụng",
+                EC: -3
+            }
+        }
         //hash password
         const hashPassword = await bcrypt.hash(data.password, salt);
 
@@ -70,7 +70,7 @@ const handleRegisterService = async (data) => {
         })
 
         return ({
-            EM: "Register succeed",
+            EM: "Đăng ký tài khoản thành công",
             EC: 0
         })
 
@@ -83,6 +83,50 @@ const handleRegisterService = async (data) => {
     }
 }
 
+const handleLoginService = async (data) => {
+    try {
+        //validate data
+        if (!data.valueLogin || !data.password) {
+            return ({
+                EM: "Missing required value",
+                EC: -2
+            })
+        }
+
+        let user = await db.User.findOne({
+            where: {
+                [Op.or]: [
+                    { email: data.valueLogin },
+                    { phone: data.valueLogin }
+                ]
+            }
+        })
+
+        if (user) {
+            let checkPassword = await bcrypt.compare(data.password, user.password);
+            if (checkPassword) {
+                return {
+                    EM: "Đăng nhập thành công",
+                    EC: 0
+                }
+            }
+        }
+
+        return {
+            EM: "Sai tên đăng nhập hoặc mật khẩu",
+            EC: -1
+        }
+
+
+    } catch (e) {
+        console.log(e);
+        return {
+            EM: "Oops, something wrong",
+            EC: -5
+        }
+    }
+}
+
 module.exports = {
-    handleRegisterService
+    handleRegisterService, handleLoginService
 }
