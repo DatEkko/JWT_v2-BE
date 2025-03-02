@@ -1,6 +1,5 @@
 import bcrypt from 'bcryptjs';
 import db from '../models/index.js';
-import { where } from 'sequelize/lib/sequelize';
 import { Op } from 'sequelize';
 
 const salt = bcrypt.genSaltSync(10);
@@ -66,7 +65,8 @@ const handleRegisterService = async (data) => {
             email: data.email,
             username: data.username,
             password: hashPassword,
-            phone: data.phone
+            phone: data.phone,
+            groupId: 2
         })
 
         return ({
@@ -128,5 +128,6 @@ const handleLoginService = async (data) => {
 }
 
 module.exports = {
-    handleRegisterService, handleLoginService
+    handleRegisterService, handleLoginService,
+    checkEmailExist, checkPhoneExist
 }
