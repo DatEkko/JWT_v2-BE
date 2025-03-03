@@ -1,6 +1,9 @@
+require('dotenv').config();
 import bcrypt from 'bcryptjs';
 import db from '../models/index.js';
 import { Op } from 'sequelize';
+import { getGroupWithRoles } from "./jwtService.js";
+import JWTActions from "./../middleware/JWTActions.js";
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -66,7 +69,7 @@ const handleRegisterService = async (data) => {
             username: data.username,
             password: hashPassword,
             phone: data.phone,
-            groupId: 2
+            groupId: 4
         })
 
         return ({
@@ -105,9 +108,22 @@ const handleLoginService = async (data) => {
         if (user) {
             let checkPassword = await bcrypt.compare(data.password, user.password);
             if (checkPassword) {
+
+                let groupWithRoles = await getGroupWithRoles(user);
+                let payload = {
+                    email: user.email,
+                    groupWithRoles,
+                }
+                let token = JWTActions.createJWT(payload);
                 return {
                     EM: "Đăng nhập thành công",
-                    EC: 0
+                    EC: 0,
+                    DT: {
+                        email: user.email,
+                        username: user.username,
+                        access_token: token,
+                        groupWithRoles
+                    }
                 }
             }
         }

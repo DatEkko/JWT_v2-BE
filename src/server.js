@@ -6,6 +6,7 @@ import initApiRoutes from "./routes/api";
 import bodyParser from "body-parser";
 import connection from "./config/connectDB";
 import configCORS from "./config/cors";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const PORT = process.env.PORT || 8888;
@@ -19,6 +20,9 @@ configViewEngine(app);
 //config body-parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }))
+
+//config cookie-parser
+app.use(cookieParser())
 
 //test connection db
 connection();
